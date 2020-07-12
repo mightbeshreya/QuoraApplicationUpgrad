@@ -58,6 +58,7 @@ public class QuestionController {
 
     }
 
+
     /* method - GET for getAllQuestions (gets all questions from DB)
         Path mapped to - /question/all
         produces JSON
@@ -67,7 +68,7 @@ public class QuestionController {
     *  */
     @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions
-            (@RequestHeader("authorization") final String authorization ) throws AuthorizationFailedException {
+    (@RequestHeader("authorization") final String authorization ) throws AuthorizationFailedException {
         /* Getting the list of all questions from the Service and in turn DB */
         List<QuestionEntity> listOfQuestions = questionBusinessService.getAllQuestions(authorization);
         /* Initializing QuestionDetailsResponse as linkedlist and adding each QuestionDetailsResponse entity to it */

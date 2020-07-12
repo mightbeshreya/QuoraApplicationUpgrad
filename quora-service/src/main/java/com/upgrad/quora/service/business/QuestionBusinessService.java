@@ -61,4 +61,5 @@ public class QuestionBusinessService {
         List<QuestionEntity> listOfQuestions  = questionDao.getAllQuestions();
         return listOfQuestions;
     }
+    
 }
