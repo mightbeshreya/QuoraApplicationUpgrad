@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+/* Whenever methods throw exception, Exception response is created and sent to the user */
 @ControllerAdvice
-public class RestExceptionHandler { //Add Exception
+public class RestExceptionHandler { //Add Exceptions that are being thrown by various methods
     @ExceptionHandler(SignUpRestrictedException.class)
     public ResponseEntity<ErrorResponse> signUpRestrictedException(SignUpRestrictedException exc, WebRequest request) {
         return new ResponseEntity<ErrorResponse>(
