@@ -97,4 +97,20 @@ public class UserDao {
             return null;
         }
     }
+
+    /* deleteUserByUserId takes in userId as argument
+    *  Named query is executed which gets the user by userId
+    *  If user exists, he is deleted with entityManager.remove
+    *  If user doesn't exist, null is returned
+    *   */
+    public String deleteUserByUserId(final String userId) {
+        try {
+            UserEntity userEntity = entityManager.createNamedQuery("userByUUID", UserEntity.class).setParameter("uuid", userId)
+                    .getSingleResult();
+            entityManager.remove(userEntity);
+            return userEntity.getUuid();
+        }catch(NoResultException nre) {
+            return null;
+        }
+    }
 }
