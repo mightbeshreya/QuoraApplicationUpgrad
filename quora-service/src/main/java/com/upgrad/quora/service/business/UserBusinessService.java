@@ -1,14 +1,11 @@
 package com.upgrad.quora.service.business;
 
-
 import com.upgrad.quora.service.common.GenericErrorCode;
 import com.upgrad.quora.service.common.UnexpectedException;
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.entity.UserEntity;
-import com.upgrad.quora.service.exception.AuthenticationFailedException;
-import com.upgrad.quora.service.exception.SignUpRestrictedException;
-import com.upgrad.quora.service.exception.UserNotFoundException;
+import com.upgrad.quora.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,7 +42,6 @@ public class UserBusinessService {
         return signUpUser;
     }
 
-
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthTokenEntity  signin(final String username, final String password) throws AuthenticationFailedException {
         UserEntity userEntity = userDao.getUserByUserName(username);
@@ -79,6 +75,31 @@ public class UserBusinessService {
             GenericErrorCode genericErrorCode = GenericErrorCode.GEN_001;
             throw new UnexpectedException(genericErrorCode, ex);
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthTokenEntity signOut(final String bearerAcccessToken) throws SignOutRestrictedException, NullPointerException {
+        UserAuthTokenEntity userAuthToken = userDao.getUserAuthToken(bearerAcccessToken);
+        //if the access token doesnt exist in the database it will throw an error with below message
+        //else if the access token exists in the database the logout time will be updated and persisted in the database
+        if (userAuthToken == null) {
+            throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
+        } else {
+            final ZonedDateTime now = ZonedDateTime.now();
+            userAuthToken.setLogoutAt(now);
+            userDao.updateUserLogoutAt(userAuthToken);
+            return userAuthToken;
+        }
+    }
+
+    public UserAuthTokenEntity getUserByToken(final String accessToken) throws AuthorizationFailedException {
+        UserAuthTokenEntity userAuthByToken = userDao.getUserAuthToken(accessToken);
+        if (userAuthByToken == null) {
+            throw new AuthorizationFailedException("ATH-001", "User has not signed in");
+        } else if (userAuthByToken.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATH-002", "User is signed out.Sign in first to get user details");
+        }
+        return userAuthByToken;
     }
 
     public UserEntity getUserById(final String userUuid) throws UserNotFoundException {
